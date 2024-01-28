@@ -1,0 +1,347 @@
+{% extends 'plantilla.html' %}
+
+{% block contenido %}
+<style>
+  /* Estilos personalizados para mejorar la apariencia */
+  h1 {
+    color: #ffc107;
+    text-align: center;
+    font-size: 36px;
+    font-family: 'Arial', sans-serif;
+    margin-bottom: 20px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+  }
+
+  h3 {
+    color: #333;
+    text-align: center;
+    font-size: 35px;
+    margin-bottom: 20px;
+  }
+
+  form {
+    background-color: #f8f9fa;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  }
+
+  table {
+    width: 100%;
+    margin-top: 20px;
+    border-collapse: collapse;
+  }
+
+  th,
+  td {
+    border: 1px solid #dee2e6;
+    padding: 10px;
+    text-align: center;
+  }
+
+  th {
+    background-color: #007bff;
+    color: #1c2833;
+  }
+
+  .btn-action {
+    margin-right: 5px;
+  }
+
+  #btnEditar {
+    padding: 4px 8px;
+    font-size: 12px;
+  }
+</style>
+
+<!-- Encabezado de la página -->
+<br>
+<h1>"Explora la diversidad de asignaturas"</h1>
+<br>
+<h3>Descubre las asignaturas disponibles en nuestra institución.</h3>
+
+<!-- Sección izquierda con el formulario para ingresar nueva asignatura -->
+<div class="row">
+  <div class="col-md-5">
+    <!-- Formulario para guardar una nueva asignatura -->
+    <form action="{% url 'guardarAsignatura' %}" method="post" enctype="multipart/form-data" id="guardarAsignaturaForm">
+      {% csrf_token %}
+
+      <!-- Campo para seleccionar el estudiante de la asignatura -->
+      <div class="form-group">
+        <label for="estudianteRAGP">Estudiante</label>
+        <select name="estudianteRAGP" id="estudianteRAGP" class="form-control" required>
+          {% for carrera in carreras %}
+            <option value="{{ carrera.idCarreraRAGP }}">{{ carrera.nombreCarreraRAGP }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <!-- Campo para ingresar el nombre de la asignatura -->
+      <div class="form-group">
+        <label for="nombreAsignaturaRAGP">Nombre de la asignatura</label>
+        <input type="text" name="nombreAsignaturaRAGP" id="nombreAsignaturaRAGP" class="form-control" placeholder="Ingrese el nombre de la asignatura" required>
+      </div>
+
+      <!-- Campo para ingresar los créditos de la asignatura -->
+      <div class="form-group">
+        <label for="creditosAsignaturaRAGP">Créditos de la asignatura</label>
+        <input type="number" name="creditosAsignaturaRAGP" id="creditosAsignaturaRAGP" class="form-control" placeholder="Ingrese los créditos de la asignatura" required>
+      </div>
+
+      <!-- Campo para ingresar la fecha de inicio de la asignatura -->
+      <div class="form-group">
+        <label for="fechaInicioAsignaturaRAGP">Fecha de inicio de la asignatura</label>
+        <input type="date" name="fechaInicioAsignaturaRAGP" id="fechaInicioAsignaturaRAGP" class="form-control" required>
+      </div>
+
+      <!-- Campo para ingresar la fecha de finalización de la asignatura -->
+      <div class="form-group">
+        <label for="fechaFinalizacionAsignaturaRAGP">Fecha de finalización de la asignatura</label>
+        <input type="date" name="fechaFinalizacionAsignaturaRAGP" id="fechaFinalizacionAsignaturaRAGP" class="form-control" required>
+      </div>
+
+      <!-- Campo para ingresar el profesor de la asignatura -->
+      <div class="form-group">
+        <label for="profesorAsignaturaRAGP">Profesor de la asignatura</label>
+        <input type="text" name="profesorAsignaturaRAGP" id="profesorAsignaturaRAGP" class="form-control" placeholder="Ingrese el profesor de la asignatura" required>
+      </div>
+
+      <!-- Campo para seleccionar el silabo de la asignatura -->
+      <div class="form-group">
+        <label for="silaboAsignaturaRAGP">Sílabo de la asignatura</label>
+        <input type="file" name="silaboAsignaturaRAGP" accept=".pdf" class="form-control">
+      </div>
+
+      <!-- Campo para ingresar el mandil de la asignatura -->
+      <div class="form-group">
+        <label for="mandilAsignaturaRAGP">Mandil de la asignatura</label>
+        <select name="mandilAsignaturaRAGP" id="mandilAsignaturaRAGP" class="form-control">
+          <option value="si">Sí</option>
+          <option value="no">No</option>
+        </select>
+      </div>
+
+
+      <div class="text-center">
+        <button type="submit" name="button" class="btn btn-primary">Guardar</button>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        <button type="reset" name="button" class="btn btn-danger">Cancelar</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Sección derecha con el listado de asignaturas existentes -->
+  <div class="col-md-7">
+    <br>
+    <!-- Tabla para mostrar el listado de asignaturas -->
+    <table id="asignaturasTable" class="table table-condensed">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Estudiante</th>
+          <th>Nombre de la Asignatura</th>
+          <th>Créditos</th>
+          <th>Fecha de Inicio</th>
+          <th>Fecha de Finalización</th>
+          <th>Profesor</th>
+          <th>Sílabo</th>
+          <th>Mandil</th>
+          <th>ACCIONES</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Itera sobre las asignaturas y muestra sus detalles en la tabla -->
+        {% for asignatura in asignaturas %}
+        <tr>
+          <td>{{ asignatura.idAsignaturaRAGP }}</td>
+          <td>{{ asignatura.estudianteRAGP.nombreCarreraRAGP }}</td>
+          <td>{{ asignatura.nombreAsignaturaRAGP }}</td>
+          <td>{{ asignatura.creditosAsignaturaRAGP }}</td>
+          <td>{{ asignatura.fechaInicioAsignaturaRAGP }}</td>
+          <td>{{ asignatura.fechaFinalizacionAsignaturaRAGP }}</td>
+          <td>{{ asignatura.profesorAsignaturaRAGP }}</td>
+          <td>
+            {% if asignatura.silaboAsignaturaRAGP %}
+            <a href="{{ asignatura.silaboAsignaturaRAGP.url }}" target="_blank">Ver Sílabo</a>
+            {% else %}
+            <b>N/A</b>
+            {% endif %}
+          </td>
+          <td>{{ asignatura.mandilAsignaturaRAGP|default:"N/A" }}</td>
+          <td>
+            <div class="btn-group">
+              <!-- Formulario de eliminación para cada asignatura -->
+              <form action="{% url 'eliminarAsignatura' asignatura.idAsignaturaRAGP %}" method="post" id="eliminarAsignaturaForm-{{ asignatura.idAsignaturaRAGP }}" style="display: inline;">
+                {% csrf_token %}
+                <button type="button" class="btn btn-danger btn-xs" onclick="confirmarEliminacionAsignatura('{{ asignatura.idAsignaturaRAGP }}')">Eliminar</button>
+              </form>
+              <!-- Enlace para editar con ID -->
+              <a href="{% url 'editarAsignatura' asignatura.idAsignaturaRAGP %}" id="btnEditar{{ asignatura.idAsignaturaRAGP }}" class="btn btn-warning btn-xs">Editar</a>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Bloque de scripts para DataTables -->
+<script type="text/javascript">
+  $(document).ready(function() {
+    $('#asignaturasTable').DataTable({
+      dom: 'Bfrtip',
+      language: {
+        "decimal": "",
+        "emptyTable": "No hay datos disponibles en la tabla",
+        "info": "Explora la diversidad de asignaturas en nuestra institución",
+        "infoEmpty": "Mostrando 0 a 0 de 0 entradas",
+        "infoFiltered": "(filtradas de _MAX_ entradas totales)",
+        "infoPostFix": "",
+        "thousands": ",",
+        "lengthMenu": "Mostrar _MENU_ entradas",
+        "loadingRecords": "Cargando...",
+        "processing": "Procesando...",
+        "search": "Buscar:",
+        "zeroRecords": "No se encontraron registros coincidentes",
+        "paginate": {
+          "first": "",
+          "last": "",
+          "next": "",
+          "previous": "Los numero #"
+        },
+        "aria": {
+          "sortAscending": ": activar para ordenar la columna ascendente",
+          "sortDescending": ": activar para ordenar la columna descendente"
+        }
+      },
+      buttons: [
+        {
+          extend: 'pdfHtml5',
+          messageTop: 'PDF creado por PDFMake con botones para DataTables.'
+        },
+        'print',
+        'csv'
+      ]
+    });
+  });
+</script>
+
+
+<!-- Bloque de scripts para iziToast Y VALIDACION DE CMAPOS-->
+<script>
+  // Validación del formulario de nueva asignatura
+  $("#guardarAsignaturaForm").validate({
+    rules: {
+      "nombreAsignaturaRAGP": {
+        required: true,
+        minlength: 5,
+        maxlength: 50
+      },
+      "creditosAsignaturaRAGP": {
+        required: true,
+        digits: true,
+        min: 1
+      },
+      "fechaInicioAsignaturaRAGP": {
+        required: true
+      },
+      "fechaFinalizacionAsignaturaRAGP": {
+        required: true
+      },
+      "profesorAsignaturaRAGP": {
+        required: true,
+        minlength: 3,
+        maxlength: 50
+      },
+      "silaboAsignaturaRAGP": {
+        required: true,
+        extension: "pdf"
+      },
+      "mandilAsignaturaRAGP": {
+        maxlength: 20
+      }
+    },
+    messages: {
+      "nombreAsignaturaRAGP": {
+        required: "Por favor, ingrese el nombre de la asignatura",
+        minlength: "El nombre de la asignatura debe tener al menos 5 caracteres",
+        maxlength: "El nombre de la asignatura no debe exceder los 50 caracteres"
+      },
+      "creditosAsignaturaRAGP": {
+        required: "Por favor, ingrese los créditos de la asignatura",
+        digits: "Ingrese solo dígitos",
+        min: "Los créditos deben ser al menos 1"
+      },
+      "fechaInicioAsignaturaRAGP": {
+        required: "Por favor, ingrese la fecha de inicio de la asignatura"
+      },
+      "fechaFinalizacionAsignaturaRAGP": {
+        required: "Por favor, ingrese la fecha de finalización de la asignatura"
+      },
+      "profesorAsignaturaRAGP": {
+        required: "Por favor, ingrese el profesor de la asignatura",
+        minlength: "El nombre del profesor debe tener al menos 3 caracteres",
+        maxlength: "El nombre del profesor no debe exceder los 50 caracteres"
+      },
+      "silaboAsignaturaRAGP": {
+        required: "Por favor, seleccione el sílabo de la asignatura",
+        extension: "Por favor, seleccione un archivo PDF"
+      },
+      "mandilAsignaturaRAGP": {
+        maxlength: "El mandil de la asignatura no debe exceder los 20 caracteres"
+      }
+    },
+    success: function (label) {
+      // Este código se ejecutará cuando un campo se valide correctamente
+      label.addClass('valid').text('Campo válido').css('color', 'green');
+    },
+    errorPlacement: function (error, element) {
+      // Este código se ejecutará para personalizar la ubicación de los mensajes de error
+      error.insertAfter(element).css("color", "red");
+    }
+  });
+
+  // Función para confirmar la eliminación de una asignatura
+  function confirmarEliminacionAsignatura(idAsignaturaRAGP) {
+    iziToast.question({
+      timeout: 15000,
+      close: true,
+      overlay: true,
+      displayMode: 'once',
+      id: 'questionAsignatura',
+      zindex: 999,
+      title: 'CONFIRMACIÓN',
+      message: '¿Está seguro de eliminar la asignatura seleccionada?',
+      position: 'center',
+      buttons: [
+        ['<button><b>SÍ</b></button>', function (instance, toast) {
+          instance.hide({ transitionOut: 'fadeOut' }, toast, 'button');
+          // Encuentra el formulario asociado y envía el formulario
+          var form = document.getElementById('eliminarAsignaturaForm-' + idAsignaturaRAGP);
+          if (form) {
+            form.submit();
+          }
+        }, true],
+        ['<button>NO</button>', function (instance, toast) {
+          instance.hide({ transitionOut: 'fadeOut' }, toast, 'button');
+        }],
+      ]
+    });
+  }
+
+  // Muestra un mensaje de éxito para el guardado
+  {% if messages %}
+  {% for message in messages %}
+  iziToast.success({
+    title: 'Éxito',
+    message: '{{ message }}',
+    position: 'topRight',
+  });
+  {% endfor %}
+  {% endif %}
+</script>
+
+
+{% endblock %}

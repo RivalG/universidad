@@ -1,0 +1,172 @@
+{% extends 'plantilla.html' %}
+
+{% block contenido %}
+<style>
+  /* Estilos personalizados para mejorar la apariencia */
+  h1 {
+    color: #007bff; /* Color del encabezado */
+    text-align: center;
+  }
+
+  /* Estilos para el formulario */
+  form {
+    background-color: #f8f9fa; /* Color de fondo del formulario */
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Sombra ligera */
+  }
+
+  /* Estilos para la tabla */
+  table {
+    width: 100%; /* Ocupa todo el ancho disponible */
+    margin-top: 20px;
+    border-collapse: collapse;
+  }
+
+  th, td {
+    border: 1px solid #dee2e6; /* Bordes de las celdas */
+    padding: 10px;
+    text-align: center;
+  }
+
+  th {
+    background-color: #007bff; /* Color de fondo del encabezado de la tabla */
+    color: #1c2833; /* Color del texto del encabezado de la tabla */
+  }
+
+  /* Estilos para los botones de acción */
+  .btn-action {
+    margin-right: 5px;
+  }
+  #actualizarCarreraForm th,
+  #actualizarCarreraForm td {
+    width: 300%; /* Puedes ajustar el valor según tus necesidades */
+  }
+
+  /* Estilos para los mensajes de error */
+  .error-message {
+    color: #dc3545;
+    font-size: 80%;
+    margin-top: 5px;
+  }
+
+</style>
+
+<div class="row">
+  <div class="col-md-2"></div>
+  <div class="col-md-8">
+    <br> <br>
+    <form class="" action="{% url 'actualizarCarrera' carrera.idCarreraRAGP %}" method="post" enctype="multipart/form-data" id="actualizarCarreraForm">
+      {% csrf_token %}
+
+      <div class="form-group">
+        <label for="nombreCarreraRAGP">Nombre del Estudiante</label>
+        <input type="text" name="nombreCarreraRAGP" id="nombreCarreraRAGP" value="{{ carrera.nombreCarreraRAGP }}" placeholder="Ingrese el nombre del Estudiante" class="form-control" required>
+      </div>
+
+      <br>
+
+
+      <div class="form-group">
+        <label for="estudianteRAGP">Nombre de la carrera</label>
+        <input type="text" name="estudianteRAGP" id="estudianteRAGP" class="form-control" placeholder="Ingrese el nombre de la carrera" value="{{ carrera.estudianteRAGP }}" required minlength="3" maxlength="100">
+      </div>
+
+
+      <br>
+
+      <div class="form-group">
+        <label for="facultad">Facultad</label>
+        <input type="text" name="facultad" id="facultad" value="{{ carrera.facultad }}" placeholder="Ingrese la facultad" class="form-control" required>
+      </div>
+
+      <br>
+
+      <div class="form-group">
+        <label for="directorCarreraRAGP">Director de Carrera</label>
+        <input type="text" name="directorCarreraRAGP" id="directorCarreraRAGP" value="{{ carrera.directorCarreraRAGP }}" placeholder="Ingrese el director de carrera" class="form-control" required>
+      </div>
+
+      <br>
+
+      <div class="form-group">
+        <label for="logoCarreraRAGP">Logo de la Carrera</label>
+        <input type="file" name="logoCarreraRAGP" id="logoCarreraRAGP" class="form-control">
+      </div>
+
+      <!-- Otros campos del formulario -->
+
+      <center>
+        <button type="submit" name="button" class="btn btn-primary">&nbsp;&nbsp;&nbsp;Guardar&nbsp;&nbsp;&nbsp;</button>
+        &nbsp;&nbsp;&nbsp;&nbsp;
+        <a href="{% url 'listadoCarreras' %}" class="btn btn-danger">Cancelar</a>
+      </center>
+    </form>
+  </div>
+</div>
+
+<script>
+  $(document).ready(function() {
+    // Validación del formulario de actualizar carrera
+    $("#actualizarCarreraForm").validate({
+      rules: {
+        "nombreCarreraRAGP": {
+          required: true,
+          minlength: 1,
+          maxlength: 255
+        },
+        "estudianteRAGP": {
+          required: true,
+          minlength: 1,
+          maxlength: 255
+        },
+        "facultad": {
+          required: true,
+          minlength: 1,
+          maxlength: 255
+        },
+        "directorCarreraRAGP": {
+          required: true,
+          minlength: 1,
+          maxlength: 255
+        },
+        // Puedes agregar más reglas de validación según tus necesidades
+      },
+      messages: {
+        "nombreCarreraRAGP": {
+          required: "Por favor, ingrese el nombre de la carrera",
+          minlength: "El nombre de la carrera debe tener al menos 1 carácter",
+          maxlength: "El nombre de la carrera no debe exceder los 255 caracteres"
+        },
+        "estudianteRAGP": {
+          required: "Por favor, ingrese el nombre del estudiante",
+          minlength: "El nombre del estudiante debe tener al menos 1 carácter",
+          maxlength: "El nombre del estudiante no debe exceder los 255 caracteres"
+        },
+        "facultad": {
+          required: "Por favor, ingrese la facultad",
+          minlength: "La facultad debe tener al menos 1 carácter",
+          maxlength: "La facultad no debe exceder los 255 caracteres"
+        },
+        "directorCarreraRAGP": {
+          required: "Por favor, ingrese el director de carrera",
+          minlength: "El director de carrera debe tener al menos 1 carácter",
+          maxlength: "El director de carrera no debe exceder los 255 caracteres"
+        }
+        // Puedes agregar mensajes personalizados para cada regla de validación
+      },
+      success: function (label) {
+        // Este código se ejecutará cuando un campo se valide correctamente
+        label.addClass('valid').text('Campo válido').css('color', 'green');
+      },
+      errorPlacement: function (error, element) {
+        // Este código se ejecutará para personalizar la ubicación de los mensajes de error
+        error.insertAfter(element).css("color", "red");
+      }
+    });
+  });
+</script>
+
+
+
+{% endblock %}

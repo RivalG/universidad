@@ -1,0 +1,294 @@
+{% extends 'plantilla.html' %}
+
+{% block contenido %}
+<style>
+  /* Estilos personalizados para mejorar la apariencia */
+  h1 {
+    color: #ffc107;
+    text-align: center;
+    font-size: 36px;
+    font-family: 'Arial', sans-serif;
+    margin-bottom: 20px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+  }
+
+  h3 {
+    color: #333;
+    text-align: center;
+    font-size: 35px;
+    margin-bottom: 20px;
+  }
+
+  form {
+    background-color: #f8f9fa;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  }
+
+  table {
+    width: 100%;
+    margin-top: 20px;
+    border-collapse: collapse;
+  }
+
+  th,
+  td {
+    border: 1px solid #dee2e6;
+    padding: 10px;
+    text-align: center;
+  }
+
+  th {
+    background-color: #007bff;
+    color: #1c2833;
+  }
+
+  .btn-action {
+    margin-right: 5px;
+  }
+
+  #btnEditar {
+    padding: 4px 8px;
+    font-size: 12px;
+  }
+</style>
+
+<!-- Encabezado de la página -->
+<br>
+<h1>"Explora la diversidad de cursos"</h1>
+<br>
+<h3>Descubre los cursos disponibles en nuestra institución.</h3>
+
+<!-- Sección izquierda con el formulario para ingresar nuevo curso -->
+<div class="row">
+  <div class="col-md-5">
+    <!-- Formulario para guardar un nuevo curso -->
+    <form action="{% url 'guardarCurso' %}" method="post" id="guardarCursoForm">
+      {% csrf_token %}
+
+      <!-- Campo para seleccionar el estudiante del curso -->
+      <div class="form-group">
+        <label for="estudianteRAGP">Estudiante</label>
+        <select name="estudianteRAGP" id="estudianteRAGP" class="form-control" required>
+          {% for carrera in carreras %}
+            <option value="{{ carrera.idCarreraRAGP }}">{{ carrera.nombreCarreraRAGP }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <!-- Campo para ingresar el nivel del curso -->
+      <div class="form-group">
+        <label for="nivelCursoRAGP">Nivel del curso</label>
+        <input type="text" name="nivelCursoRAGP" id="nivelCursoRAGP" class="form-control" placeholder="Ingrese el nivel del curso" required>
+      </div>
+
+      <!-- Campo para ingresar la descripción del curso -->
+      <div class="form-group">
+        <label for="descripcionCursoRAGP">Descripción del curso</label>
+        <textarea name="descripcionCursoRAGP" id="descripcionCursoRAGP" class="form-control" placeholder="Ingrese la descripción del curso" required></textarea>
+      </div>
+
+      <!-- Campo para ingresar el aula del curso -->
+      <div class="form-group">
+        <label for="aulaCursoRAGP">Aula del curso</label>
+        <input type="text" name="aulaCursoRAGP" id="aulaCursoRAGP" class="form-control" placeholder="Ingrese el aula del curso" required>
+      </div>
+
+      <!-- Campo para ingresar el número de estudiantes del curso -->
+      <div class="form-group">
+        <label for="numeroEstudiantesRAGP">Número de estudiantes</label>
+        <input type="number" name="numeroEstudiantesRAGP" id="numeroEstudiantesRAGP" class="form-control" placeholder="Ingrese el número de estudiantes" required>
+      </div>
+
+      <div class="text-center">
+        <button type="submit" name="button" class="btn btn-primary">Guardar</button>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        <button type="reset" name="button" class="btn btn-danger">Cancelar</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Sección derecha con el listado de cursos existentes -->
+  <div class="col-md-7">
+    <br>
+    <!-- Tabla para mostrar el listado de cursos -->
+    <table id="cursosTable" class="table table-condensed">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Estudiante</th>
+          <th>Nivel del Curso</th>
+          <th>Descripción del Curso</th>
+          <th>Aula del Curso</th>
+          <th>Número de Estudiantes</th>
+          <th>ACCIONES</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Itera sobre los cursos y muestra sus detalles en la tabla -->
+        {% for curso in cursos %}
+        <tr>
+          <td>{{ curso.idCursoRAGP }}</td>
+          <td>{{ curso.estudianteRAGP.nombreCarreraRAGP }}</td>
+          <td>{{ curso.nivelCursoRAGP }}</td>
+          <td>{{ curso.descripcionCursoRAGP }}</td>
+          <td>{{ curso.aulaCursoRAGP }}</td>
+          <td>{{ curso.numeroEstudiantesRAGP }}</td>
+          <td>
+            <div class="btn-group">
+              <!-- Formulario de eliminación para cada curso -->
+              <form action="{% url 'eliminarCurso' curso.idCursoRAGP %}" method="post" id="eliminarCursoForm-{{ curso.idCursoRAGP }}" style="display: inline;">
+                {% csrf_token %}
+                <button type="button" class="btn btn-danger btn-xs" onclick="confirmarEliminacionCurso('{{ curso.idCursoRAGP }}')">Eliminar</button>
+              </form>
+              <a href="{% url 'editarCurso' curso.idCursoRAGP %}" class="btn btn-warning btn-xs" id="btnEditar">Editar</a>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Bloque de scripts para DataTables -->
+<script type="text/javascript">
+  $(document).ready(function() {
+    $('#cursosTable').DataTable({
+      dom: 'Bfrtip',
+      language: {
+        "decimal": "",
+        "emptyTable": "No hay datos disponibles en la tabla",
+        "info": "Explora la diversidad de cursos en nuestra institución",
+        "infoEmpty": "Mostrando 0 a 0 de 0 entradas",
+        "infoFiltered": "(filtradas de _MAX_ entradas totales)",
+        "infoPostFix": "",
+        "thousands": ",",
+        "lengthMenu": "Mostrar _MENU_ entradas",
+        "loadingRecords": "Cargando...",
+        "processing": "Procesando...",
+        "search": "Buscar:",
+        "zeroRecords": "No se encontraron registros coincidentes",
+        "paginate": {
+          "first": "",
+          "last": "",
+          "next": "",
+          "previous": "Los numero #"
+        },
+        "aria": {
+          "sortAscending": ": activar para ordenar la columna ascendente",
+          "sortDescending": ": activar para ordenar la columna descendente"
+        }
+      },
+      buttons: [
+        {
+          extend: 'pdfHtml5',
+          messageTop: 'PDF creado por PDFMake con botones para DataTables.'
+        },
+        'print',
+        'csv'
+      ]
+    });
+  });
+</script>
+
+<!-- Bloque de scripts para iziToast -->
+<script>
+  // Validación del formulario de nuevo curso
+  $("#guardarCursoForm").validate({
+    rules: {
+      "nivelCursoRAGP": {
+        required: true,
+        minlength: 1,
+        maxlength: 10
+      },
+      "descripcionCursoRAGP": {
+        required: true,
+        minlength: 5,
+        maxlength: 255
+      },
+      "aulaCursoRAGP": {
+        required: true,
+        minlength: 1,
+        maxlength: 20
+      },
+      "numeroEstudiantesRAGP": {
+        required: true,
+        digits: true,
+        min: 1
+      }
+    },
+    messages: {
+      "nivelCursoRAGP": {
+        required: "Por favor, ingrese el nivel del curso",
+        minlength: "El nivel del curso debe tener al menos 1 carácter",
+        maxlength: "El nivel del curso no debe exceder los 10 caracteres"
+      },
+      "descripcionCursoRAGP": {
+        required: "Por favor, ingrese la descripción del curso",
+        minlength: "La descripción del curso debe tener al menos 5 caracteres",
+        maxlength: "La descripción del curso no debe exceder los 255 caracteres"
+      },
+      "aulaCursoRAGP": {
+        required: "Por favor, ingrese el aula del curso",
+        minlength: "El aula del curso debe tener al menos 1 carácter",
+        maxlength: "El aula del curso no debe exceder los 20 caracteres"
+      },
+      "numeroEstudiantesRAGP": {
+        required: "Por favor, ingrese el número de estudiantes",
+        digits: "Ingrese solo dígitos",
+        min: "El número de estudiantes debe ser al menos 1"
+      }
+    },
+    success: function (label) {
+      // Este código se ejecutará cuando un campo se valide correctamente
+      label.addClass('valid').text('Campo válido').css('color', 'green');
+    },
+    errorPlacement: function (error, element) {
+      // Este código se ejecutará para personalizar la ubicación de los mensajes de error
+      error.insertAfter(element).css("color", "red");
+    }
+  });
+
+  // Función para confirmar la eliminación de un curso
+  function confirmarEliminacionCurso(idCursoRAGP) {
+    iziToast.question({
+      timeout: 15000,
+      close: true,
+      overlay: true,
+      displayMode: 'once',
+      id: 'questionCurso',
+      zindex: 999,
+      title: 'CONFIRMACIÓN',
+      message: '¿Está seguro de eliminar el curso seleccionado?',
+      position: 'center',
+      buttons: [
+        ['<button><b>SÍ</b></button>', function (instance, toast) {
+          instance.hide({ transitionOut: 'fadeOut' }, toast, 'button');
+          // Encuentra el formulario asociado y envía el formulario
+          var form = document.getElementById('eliminarCursoForm-' + idCursoRAGP);
+          if (form) {
+            form.submit();
+          }
+        }, true],
+        ['<button>NO</button>', function (instance, toast) {
+          instance.hide({ transitionOut: 'fadeOut' }, toast, 'button');
+        }],
+      ]
+    });
+  }
+
+  // Muestra un mensaje de éxito para el guardado
+  {% if messages %}
+  {% for message in messages %}
+  iziToast.success({
+    title: 'Éxito',
+    message: '{{ message }}',
+    position: 'topRight',
+  });
+  {% endfor %}
+  {% endif %}
+</script>
+
+{% endblock %}

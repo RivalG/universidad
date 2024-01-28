@@ -1,0 +1,177 @@
+{% extends 'plantilla.html' %}
+
+{% block contenido %}
+<style>
+  /* Estilos personalizados para mejorar la apariencia */
+  h1 {
+    color: #007bff; /* Color del encabezado */
+    text-align: center;
+  }
+
+  /* Estilos para el formulario */
+  form {
+    background-color: #f8f9fa; /* Color de fondo del formulario */
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Sombra ligera */
+  }
+
+  /* Estilos para la tabla */
+  table {
+    width: 100%; /* Ocupa todo el ancho disponible */
+    margin-top: 20px;
+    border-collapse: collapse;
+  }
+
+  th, td {
+    border: 1px solid #dee2e6; /* Bordes de las celdas */
+    padding: 10px;
+    text-align: center;
+  }
+
+  th {
+    background-color: #007bff; /* Color de fondo del encabezado de la tabla */
+    color: #1c2833; /* Color del texto del encabezado de la tabla */
+  }
+
+  /* Estilos para los botones de acción */
+  .btn-action {
+    margin-right: 5px;
+  }
+  #editarCursoForm th,
+  #editarCursoForm td {
+    width: 300%; /* Puedes ajustar el valor según tus necesidades */
+  }
+
+  /* Estilos para los mensajes de error */
+  .error-message {
+    color: #dc3545;
+    font-size: 80%;
+    margin-top: 5px;
+  }
+</style>
+
+<div class="row">
+  <div class="col-md-2"></div>
+  <div class="col-md-8">
+    <br> <br>
+    <form action="{% url 'actualizarCurso' idCursoRAGP=curso.idCursoRAGP %}" method="post" enctype="multipart/form-data" id="editarCursoForm">
+      {% csrf_token %}
+
+
+      <br>
+
+      <div class="form-group">
+        <label for="estudianteRAGP">Estudiante</label>
+        <select name="estudianteRAGP" id="estudianteRAGP" class="form-control" required>
+          {% for carrera in carreras %}
+            <option value="{{ carrera.idCarreraRAGP }}" {% if carrera.idCarreraRAGP == curso.estudianteRAGP.idCarreraRAGP %} selected {% endif %}>{{ carrera.nombreCarreraRAGP }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <br>
+
+      <div class="form-group">
+        <label for="nivelCursoRAGP">Nivel del Curso</label>
+        <input type="text" name="nivelCursoRAGP" id="nivelCursoRAGP" value="{{ curso.nivelCursoRAGP }}" placeholder="Ingrese el nivel del curso" class="form-control" required>
+      </div>
+
+      <br>
+
+      <div class="form-group">
+        <label for="descripcionCursoRAGP">Descripción del Curso</label>
+        <textarea name="descripcionCursoRAGP" id="descripcionCursoRAGP" class="form-control" placeholder="Ingrese la descripción del curso" required>{{ curso.descripcionCursoRAGP }}</textarea>
+      </div>
+
+      <br>
+
+      <div class="form-group">
+        <label for="aulaCursoRAGP">Aula del Curso</label>
+        <input type="text" name="aulaCursoRAGP" id="aulaCursoRAGP" value="{{ curso.aulaCursoRAGP }}" placeholder="Ingrese el aula del curso" class="form-control" required>
+      </div>
+
+      <br>
+
+      <div class="form-group">
+        <label for="numeroEstudiantesRAGP">Número de Estudiantes</label>
+        <input type="number" name="numeroEstudiantesRAGP" id="numeroEstudiantesRAGP" value="{{ curso.numeroEstudiantesRAGP }}" class="form-control" required>
+      </div>
+
+      <!-- Otros campos del formulario -->
+
+      <center>
+        <button type="submit" name="button" class="btn btn-primary">&nbsp;&nbsp;&nbsp;Guardar&nbsp;&nbsp;&nbsp;</button>
+        &nbsp;&nbsp;&nbsp;&nbsp;
+        <a href="{% url 'listarCursos' %}" class="btn btn-danger">Cancelar</a>
+      </center>
+    </form>
+  </div>
+</div>
+
+
+
+<script>
+  $(document).ready(function() {
+    // Validación del formulario de editar curso
+    $("#editarCursoForm").validate({
+      rules: {
+        "nivelCursoRAGP": {
+          required: true,
+          minlength: 1,
+          maxlength: 10
+        },
+        "descripcionCursoRAGP": {
+          required: true,
+          minlength: 5,
+          maxlength: 255
+        },
+        "aulaCursoRAGP": {
+          required: true,
+          minlength: 1,
+          maxlength: 20
+        },
+        "numeroEstudiantesRAGP": {
+          required: true,
+          digits: true,
+          min: 1
+        }
+        // Puedes agregar más reglas de validación según tus necesidades
+      },
+      messages: {
+        "nivelCursoRAGP": {
+          required: "Por favor, ingrese el nivel del curso",
+          minlength: "El nivel del curso debe tener al menos 1 carácter",
+          maxlength: "El nivel del curso no debe exceder los 10 caracteres"
+        },
+        "descripcionCursoRAGP": {
+          required: "Por favor, ingrese la descripción del curso",
+          minlength: "La descripción del curso debe tener al menos 5 caracteres",
+          maxlength: "La descripción del curso no debe exceder los 255 caracteres"
+        },
+        "aulaCursoRAGP": {
+          required: "Por favor, ingrese el aula del curso",
+          minlength: "El aula del curso debe tener al menos 1 carácter",
+          maxlength: "El aula del curso no debe exceder los 20 caracteres"
+        },
+        "numeroEstudiantesRAGP": {
+          required: "Por favor, ingrese el número de estudiantes",
+          digits: "Ingrese solo dígitos",
+          min: "El número de estudiantes debe ser al menos 1"
+        }
+        // Puedes agregar mensajes personalizados para cada regla de validación
+      },
+      success: function (label) {
+        // Este código se ejecutará cuando un campo se valide correctamente
+        label.addClass('valid').text('Campo válido').css('color', 'green');
+      },
+      errorPlacement: function (error, element) {
+        // Este código se ejecutará para personalizar la ubicación de los mensajes de error
+        error.insertAfter(element).css("color", "red");
+      }
+    });
+  });
+</script>
+
+
+{% endblock %}

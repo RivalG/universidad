@@ -1,0 +1,178 @@
+{% extends 'plantilla.html' %}
+
+{% block contenido %}
+<style>
+  /* Estilos personalizados para mejorar la apariencia */
+  h1 {
+    color: #ffc107;
+    text-align: center;
+    font-size: 36px;
+    font-family: 'Arial', sans-serif;
+    margin-bottom: 20px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+  }
+
+  form {
+    background-color: #f8f9fa;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  }
+
+  label {
+    font-weight: bold;
+  }
+
+  .form-group {
+    margin-bottom: 20px;
+  }
+
+  .text-center {
+    text-align: center;
+  }
+
+  .btn-primary {
+    background-color: #007bff;
+    color: #fff;
+  }
+
+  .btn-danger {
+    background-color: #dc3545;
+    color: #fff;
+  }
+</style>
+
+<!-- Encabezado de la página -->
+<br>
+<h1>Editar Asignatura</h1>
+
+<!-- Formulario para editar una asignatura -->
+<div class="row">
+  <div class="col-md-6 offset-md-3">
+    <form action="{% url 'actualizarAsignatura' asignatura.idAsignaturaRAGP %}" method="post" enctype="multipart/form-data" id="editarAsignaturaForm">
+      {% csrf_token %}
+
+      <div class="form-group">
+        <label for="estudianteRAGP">Estudiante</label>
+        <select name="estudianteRAGP" id="estudianteRAGP" class="form-control" required>
+          {% for carrera in carreras %}
+            <option value="{{ carrera.idCarreraRAGP }}" {% if carrera.idCarreraRAGP == asignatura.estudianteRAGP.idCarreraRAGP %} selected {% endif %}>{{ carrera.nombreCarreraRAGP }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="nombreAsignaturaRAGP">Nombre de la asignatura</label>
+        <input type="text" name="nombreAsignaturaRAGP" id="nombreAsignaturaRAGP" class="form-control" value="{{ asignatura.nombreAsignaturaRAGP }}" required>
+      </div>
+
+      <div class="form-group">
+        <label for="creditosAsignaturaRAGP">Créditos de la asignatura</label>
+        <input type="number" name="creditosAsignaturaRAGP" id="creditosAsignaturaRAGP" class="form-control" value="{{ asignatura.creditosAsignaturaRAGP }}" required>
+      </div>
+
+      <div class="form-group">
+        <label for="fechaInicioAsignaturaRAGP">Fecha de inicio de la asignatura</label>
+        <input type="date" name="fechaInicioAsignaturaRAGP" id="fechaInicioAsignaturaRAGP" class="form-control" value="{{ asignatura.fechaInicioAsignaturaRAGP }}" required>
+      </div>
+
+      <div class="form-group">
+        <label for="fechaFinalizacionAsignaturaRAGP">Fecha de finalización de la asignatura</label>
+        <input type="date" name="fechaFinalizacionAsignaturaRAGP" id="fechaFinalizacionAsignaturaRAGP" class="form-control" value="{{ asignatura.fechaFinalizacionAsignaturaRAGP }}" required>
+      </div>
+
+      <div class="form-group">
+        <label for="profesorAsignaturaRAGP">Profesor de la asignatura</label>
+        <input type="text" name="profesorAsignaturaRAGP" id="profesorAsignaturaRAGP" class="form-control" value="{{ asignatura.profesorAsignaturaRAGP }}" required>
+      </div>
+
+      <div class="form-group">
+        <label for="silaboAsignaturaRAGP">Sílabo de la asignatura</label>
+        <input type="file" name="silaboAsignaturaRAGP" accept=".pdf" class="form-control">
+      </div>
+
+      <!-- Campo para ingresar el mandil de la asignatura -->
+      <div class="form-group">
+        <label for="mandilAsignaturaRAGP">Mandil de la asignatura</label>
+        <select name="mandilAsignaturaRAGP" id="mandilAsignaturaRAGP" class="form-control">
+          <option value="si">Sí</option>
+          <option value="no">No</option>
+        </select>
+      </div>
+
+
+      <div class="text-center">
+        <button type="submit" name="button" class="btn btn-primary">Guardar Cambios</button>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        <a href="{% url 'listadoAsignaturas' %}" class="btn btn-danger">Cancelar</a>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  $(document).ready(function() {
+    // Validación del formulario de editar asignatura
+    $("#editarAsignaturaForm").validate({
+      rules: {
+        "nombreAsignaturaRAGP": {
+          required: true,
+          minlength: 1,
+          maxlength: 255
+        },
+        "creditosAsignaturaRAGP": {
+          required: true,
+          digits: true,
+          min: 1
+        },
+        "fechaInicioAsignaturaRAGP": {
+          required: true
+        },
+        "fechaFinalizacionAsignaturaRAGP": {
+          required: true
+        },
+        "profesorAsignaturaRAGP": {
+          required: true,
+          minlength: 1,
+          maxlength: 255
+        },
+        // Puedes agregar más reglas de validación según tus necesidades
+      },
+      messages: {
+        "nombreAsignaturaRAGP": {
+          required: "Por favor, ingrese el nombre de la asignatura",
+          minlength: "El nombre de la asignatura debe tener al menos 1 carácter",
+          maxlength: "El nombre de la asignatura no debe exceder los 255 caracteres"
+        },
+        "creditosAsignaturaRAGP": {
+          required: "Por favor, ingrese la cantidad de créditos",
+          digits: "Ingrese solo dígitos",
+          min: "La cantidad de créditos debe ser al menos 1"
+        },
+        "fechaInicioAsignaturaRAGP": {
+          required: "Por favor, ingrese la fecha de inicio"
+        },
+        "fechaFinalizacionAsignaturaRAGP": {
+          required: "Por favor, ingrese la fecha de finalización"
+        },
+        "profesorAsignaturaRAGP": {
+          required: "Por favor, ingrese el nombre del profesor",
+          minlength: "El nombre del profesor debe tener al menos 1 carácter",
+          maxlength: "El nombre del profesor no debe exceder los 255 caracteres"
+        }
+        // Puedes agregar mensajes personalizados para cada regla de validación
+      },
+      success: function (label) {
+        // Este código se ejecutará cuando un campo se valide correctamente
+        label.addClass('valid').text('Campo válido').css('color', 'green');
+      },
+      errorPlacement: function (error, element) {
+        // Este código se ejecutará para personalizar la ubicación de los mensajes de error
+        error.insertAfter(element).css("color", "red");
+      }
+    });
+  });
+</script>
+
+
+{% endblock %}
